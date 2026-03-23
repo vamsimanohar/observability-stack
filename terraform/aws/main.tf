@@ -104,6 +104,15 @@ module "eks" {
       min_size       = var.node_count
       max_size       = var.node_count + 1
       desired_size   = var.node_count
+      block_device_mappings = {
+        xvda = {
+          device_name = "/dev/xvda"
+          ebs = {
+            volume_size = 500
+            volume_type = "gp3"
+          }
+        }
+      }
     }
   }
 

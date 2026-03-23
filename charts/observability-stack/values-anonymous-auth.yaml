@@ -4,10 +4,9 @@
 #   helm install obs-stack . -f values-anonymous-auth.yaml
 #   helm upgrade obs-stack . -f values-anonymous-auth.yaml
 #
-# This enables anonymous access to OpenSearch Dashboards — users can browse
-# data, view/create/modify saved objects, explore traces, and run queries
-# without logging in. They cannot delete existing saved objects or perform
-# admin operations.
+# This enables read-only anonymous access to OpenSearch Dashboards — users can
+# browse data, explore traces, and run queries without logging in. They cannot
+# modify saved objects or perform admin operations.
 #
 # IMPORTANT: If toggling on an existing deployment, you must delete the
 # OpenSearch StatefulSet PVCs to force security config reinitialization:
@@ -51,17 +50,37 @@ opensearch:
             type: "roles"
             config_version: 2
           opendistro_security_anonymous_role:
-            reserved: true
+            reserved: false
             cluster_permissions:
-              - "read"
-              - "cluster_monitor"
-              - "cluster_composite_ops"
+              - "cluster:monitor/state"
+              - "cluster:monitor/health"
+              - "cluster:monitor/nodes/info"
+              - "cluster:monitor/main"
               - "indices:data/read/scroll*"
               - "cluster:admin/opensearch/ppl"
               - "cluster:admin/opensearch/sql"
               - "cluster:admin/opensearch/ql/datasources/read"
               - "cluster:admin/opensearch/ql/async_query/read"
               - "cluster:admin/opensearch/direct_query/read/query"
+              - "cluster:admin/opendistro/ism/policy/search"
+              - "cluster:admin/opendistro/ism/policy/get"
+              - "cluster:admin/opendistro/ism/managedindex/explain"
+              - "cluster:admin/opendistro/rollup/search"
+              - "cluster:admin/opendistro/rollup/get"
+              - "cluster:admin/opendistro/rollup/explain"
+              - "cluster:admin/opendistro/transform/get_transforms"
+              - "cluster:admin/opendistro/transform/get"
+              - "cluster:admin/opendistro/transform/explain"
+              - "cluster:admin/opensearch/securityanalytics/rule/search"
+              - "cluster:admin/opensearch/securityanalytics/detector/search"
+              - "cluster:admin/opensearch/securityanalytics/findings/get"
+              - "cluster:admin/opensearch/securityanalytics/alerts/get"
+              - "cluster:admin/opensearch/securityanalytics/detector/get"
+              - "cluster:admin/opensearch/securityanalytics/logtype/search"
+              - "cluster:admin/opensearch/ml/connectors/search"
+              - "cluster:admin/opensearch/ml/predict"
+              - "indices:data/read/mget"
+              - "indices:data/read/mget*"
             index_permissions:
               - index_patterns:
                   - ".kibana"
@@ -72,9 +91,11 @@ opensearch:
                   - ".opensearch_dashboards_*"
                 allowed_actions:
                   - "read"
-                  - "indices:data/write/index*"
-                  - "indices:data/write/update*"
-                  - "indices:data/write/bulk*"
+                  - "indices:data/read*"
+                  - "indices:data/read/mget"
+                  - "indices:data/read/mget*"
+                  - "indices:admin/mappings/fields/get*"
+                  - "indices:admin/resolve/index"
               - index_patterns:
                   - ".tasks"
                   - ".management-beats"
@@ -83,23 +104,33 @@ opensearch:
                 allowed_actions:
                   - "read"
               - index_patterns:
+                  - "opensearch_dashboards_sample_data_logs"
+                  - "opensearch_dashboards_sample_data_flights"
+                  - "opensearch_dashboards_sample_data_ecommerce"
+                allowed_actions:
+                  - "read"
+              - index_patterns:
                   - '*'
                 allowed_actions:
                   - "read"
                   - "indices:data/read/*"
+                  - "indices:data/read/mget"
+                  - "indices:data/read/mget*"
+                  - "indices:data/read/search"
+                  - "indices:data/read/search*"
                   - "indices:admin/get"
                   - "indices:admin/exists"
+                  - "indices:admin/resolve/index"
                   - "indices:admin/aliases/exists*"
                   - "indices:admin/aliases/get*"
                   - "indices:admin/mappings/get"
-                  - "indices:admin/resolve/index"
                   - "indices:monitor/settings/get"
                   - "indices:monitor/stats"
             tenant_permissions:
               - tenant_patterns:
                   - '*'
                 allowed_actions:
-                  - "kibana_all_write"
+                  - "kibana_all_read"
         roles_mapping.yml: |-
           _meta:
             type: "rolesmapping"
@@ -134,8 +165,8 @@ opensearch-dashboards:
       opensearch.requestTimeout: 30000
       opensearch.requestHeadersAllowlist: ["authorization", "securitytenant"]
       opensearch_security.auth.anonymous_auth_enabled: true
-      savedObjects.permission.enabled: false
       opensearch_security.multitenancy.enabled: false
+      savedObjects.permission.enabled: false
       opensearch_security.readonly_mode.roles: ["kibana_read_only"]
       console.enabled: true
       server.maxPayloadBytes: 1048576
