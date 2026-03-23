@@ -1,0 +1,11 @@
+region             = "us-west-2"
+cluster_name       = "obs-stack-test"
+domain             = "obs.reddyvam.people.aws.dev"
+route53_zone_id    = "Z01321681LS1M2H0N4ZR7"
+anonymous_auth     = true
+enable_examples    = false
+enable_otel_demo   = true
+enable_waf         = false
+node_count         = 3
+node_instance_type = "m5.xlarge"
+opensearch_password = "TestDeploy_2026!@#"

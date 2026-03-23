@@ -1,0 +1,9 @@
+region          = "eu-west-1"
+cluster_name    = "obs-stack-v2"
+domain          = "observability.playground.opensearch.org"
+route53_zone_id = "Z05624321UJUWT1WYRDMG"
+anonymous_auth  = true
+enable_examples = true
+enable_waf      = true
+node_count      = 6
+node_instance_type = "m5.2xlarge"

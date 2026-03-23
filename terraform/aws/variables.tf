@@ -71,6 +71,12 @@ variable "enable_examples" {
   default     = false
 }
 
+variable "enable_otel_demo" {
+  description = "Deploy OpenTelemetry demo (~20 microservices generating realistic telemetry)"
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   description = "Tags applied to all resources"
   type        = map(string)

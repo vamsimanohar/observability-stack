@@ -171,6 +171,10 @@ resource "helm_release" "observability_stack" {
     name  = "examples.enabled"
     value = var.enable_examples ? "true" : "false"
   }
+  set {
+    name  = "opentelemetry-demo.enabled"
+    value = var.enable_otel_demo ? "true" : "false"
+  }
 
   depends_on = [
     helm_release.aws_lb_controller,

@@ -55,6 +55,10 @@ resource "helm_release" "external_dns" {
     value = var.domain
   }
   set {
+    name  = "extraArgs[0]"
+    value = "--zone-id-filter=${var.route53_zone_id}"
+  }
+  set {
     name  = "policy"
     value = "sync"
   }
